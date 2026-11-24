@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Users</title>
+<style>body{margin:0;padding:14px;background:#f4f5f8;font:15px "Segoe UI",Roboto,Arial,sans-serif;color:#14181f}.c{max-width:560px;margin:auto;background:#fff;padding:16px;border-radius:12px;border:1px solid #d9dde5}
+h1{font-size:18px;color:#14234d;margin:0 0 10px}input,select{padding:9px;border:1px solid #d9dde5;border-radius:7px;font:inherit;margin:3px 0;width:100%;box-sizing:border-box}
+button{padding:8px 12px;background:#14234d;color:#fff;border:0;border-radius:7px;font:inherit;cursor:pointer;margin:2px}.r{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #d9dde5;padding:8px 0}a{color:#14234d}</style></head>
+<body><div class="c"><a href="/">← Back to accounts</a><h1>Users</h1><div id="l"></div><h1 style="margin-top:18px">Add user</h1>
+<input id="u" placeholder="Username"><input id="p" type="password" placeholder="Password (min 6)"><select id="r"><option value="user">User (full access)</option><option value="admin">Admin (can manage users)</option></select><button id="a">Add user</button></div>
+<script>
+function J(m,u,b){return fetch(u,{method:m,headers:{"Content-Type":"application/json"},body:b?JSON.stringify(b):undefined}).then(function(r){return r.json().then(function(j){if(!r.ok)throw j;return j;});});}
+function load(){J("GET","/api/users").then(function(us){l.innerHTML="";us.forEach(function(x){var d=document.createElement("div");d.className="r";d.innerHTML="<span><b></b> ("+x.role+")</span><span></span>";d.querySelector("b").textContent=x.username;var s=d.lastChild;
+var b1=document.createElement("button");b1.textContent="New password";b1.onclick=function(){var p=prompt("New password for "+x.username+" (min 6)");if(p)J("POST","/api/users/"+x.id+"/password",{password:p}).then(function(){alert("Done")}).catch(function(e){alert(e.error)});};
+var b2=document.createElement("button");b2.textContent="Delete";b2.style.background="#b3261e";b2.onclick=function(){if(confirm("Delete "+x.username+"?"))J("DELETE","/api/users/"+x.id).then(load).catch(function(e){alert(e.error)});};
+s.appendChild(b1);s.appendChild(b2);l.appendChild(d);});});}
+a.onclick=function(){J("POST","/api/users",{username:u.value,password:p.value,role:r.value}).then(function(){u.value=p.value="";load();}).catch(function(e){alert(e.error||"Failed")});};load();
+</script></body></html>
